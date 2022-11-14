@@ -87,13 +87,6 @@
                 android:id="@+id/exo_duration"
                 android:textColor="#CBCDC8"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/bt_quality"
-                android:visibility="gone"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/ic_baseline_settings_small"/>
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -108,11 +101,45 @@
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:visibility="visible"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/bt_fullscreen"
-                android:src="@drawable/ic_baseline_fullscreen_24"/>
+
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/bt_fullscreen"
+        android:scaleType="fitXY"
+        app:tint="@color/white"
+        android:visibility="visible"
+        android:layout_centerInParent="true"
+        android:src="@drawable/video_normal"/>
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/btnCrop"
+        android:scaleType="fitXY"
+        app:tint="@color/white"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:src="@drawable/video_crop"/>
+
+
+    <ImageView
+        android:id="@+id/btnNormal"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_centerInParent="true"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        android:src="@drawable/exo_controls_fullscreen_enter"
+        app:tint="@color/white" />
+
+
+</RelativeLayout>
+
 
 
         </LinearLayout>

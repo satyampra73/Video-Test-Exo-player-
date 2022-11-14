@@ -9,7 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -49,16 +48,14 @@ public class MainActivity extends AppCompatActivity {
 
     PlayerView playerView;
     ProgressBar progressBar;
-    ImageView btFullScreen;
+    ImageView btnFit;
     SimpleExoPlayer simpleExoPlayer;
 
-    boolean flag = false;
-    ImageView btQuality;
-    boolean isFullScreen = false;
-    ImageView imgSpeed;
+    ImageView imgSpeed, btnCrop, btnNormal;
     TextView speedTXT;
 
-    String[] speed = {"0.25x","0.5x","Normal","1.5x","2x"};
+    String[] speed = {"0.25x", "0.5x", "Normal", "1.5x", "2x"};
+    int videoMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,18 +64,13 @@ public class MainActivity extends AppCompatActivity {
 
         playerView = findViewById(R.id.player_view);
         progressBar = findViewById(R.id.progress_bar);
-        btFullScreen = playerView.findViewById(R.id.bt_fullscreen);
-        btQuality = playerView.findViewById(R.id.bt_quality);
-        imgSpeed=playerView.findViewById(R.id.imgSpped);
-        speedTXT=playerView.findViewById(R.id.speed);
+        btnFit = playerView.findViewById(R.id.bt_fullscreen);
+        imgSpeed = playerView.findViewById(R.id.imgSpped);
+        speedTXT = playerView.findViewById(R.id.speed);
+        btnCrop = playerView.findViewById(R.id.btnCrop);
+        btnNormal = playerView.findViewById(R.id.btnNormal);
 
-        //   Uri videoUrl= Uri.parse("https://www.radiantmediaplayer.com/media/big-buck-bunny-360p.mp4");
-        //  Uri videoUrl= Uri.parse("https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8");
-        //   Uri videoUrl= Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4pall.m3u8");
-
-        //Uri videoUrl = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"); //todo running url 1
         Uri videoUrl = Uri.parse("https://jsoncompare.org/LearningContainer/SampleFiles/Video/MP4/sample-mp4-file.mp4"); //todo running url 2
-
 
 
         LoadControl loadControl = new DefaultLoadControl();
@@ -92,10 +84,7 @@ public class MainActivity extends AppCompatActivity {
         MediaSource mediaSource = new ExtractorMediaSource(videoUrl, factory, extractorsFactory, null, null);
 
 
-
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        setFullScreen();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -108,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         playerView.setLayoutParams(params);
 
-//                    Toast.makeText(Details.this, "We are going to FullScreen Mode.", Toast.LENGTH_SHORT).show();
-        isFullScreen = true;
 
         playerView.setPlayer(simpleExoPlayer);
         playerView.setKeepScreenOn(true);
@@ -118,45 +105,39 @@ public class MainActivity extends AppCompatActivity {
         simpleExoPlayer.setPlayWhenReady(true);
 
 
-//
-//        btQuality.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                PopupMenu popup = new PopupMenu(MainActivity.this, view);
-//                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//                    @Override public boolean onMenuItemClick(MenuItem item) {
-//                        simpleExoPlayer.setSelectedTrack(0, (item.getItemId() - 1));
-//                        return false;
-//                    }
-//                });
-//                ArrayList<Integer> formats = new ArrayList<>();
-//                Menu menu = popup.getMenu();
-//                menu.add(Menu.NONE, 0, 0, "Bitrate");
-//                for (int i = 0; i < simpleExoPlayer.getTrackCount(0); i++) {
-//                    MediaFormat format = simpleExoPlayer.getTrackFormat(0, i);
-//                    if (MimeTypes.isVideo(format.mimeType)) {
-//                        Log.e("dsa", format.bitrate + "");
-//                        if (format.adaptive) {
-//                            menu.add(1, (i + 1), (i + 1), "Auto");
-//                        } else {
-//                            if (!formats.contains(format.bitrate)) {
-//                                menu.add(1, (i + 1), (i + 1), (format.bitrate) / 1000 + " kbps");
-//                                formats.add(format.bitrate);
-//                            }
-//                        }
-//                    }
-//                }
-//
-//
-//                menu.setGroupCheckable(1, true, true);
-//                menu.findItem((simpleExoPlayer.getSelectedTrack(0) + 1)).setChecked(true);
-//                popup.show();
-//            }
-//
-//        });
+        addListeners();
 
+    }
 
-//
+    private void addListeners() {
+
+        btnNormal.setOnClickListener(v -> {
+            playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+            videoMode = playerView.getResizeMode();
+            btnFit.setVisibility(View.GONE);
+            btnCrop.setVisibility(View.VISIBLE);
+            btnNormal.setVisibility(View.GONE);
+        });
+
+        btnCrop.setOnClickListener(v -> {
+            playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+            videoMode = playerView.getResizeMode();
+            btnNormal.setVisibility(View.GONE);
+            btnCrop.setVisibility(View.GONE);
+            btnFit.setVisibility(View.VISIBLE);
+        });
+
+        btnFit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+                videoMode = playerView.getResizeMode();
+                btnCrop.setVisibility(View.GONE);
+                btnFit.setVisibility(View.GONE);
+                btnNormal.setVisibility(View.VISIBLE);
+            }
+        });
+
 
         imgSpeed.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,31 +145,6 @@ public class MainActivity extends AppCompatActivity {
                 SetSpeed();
             }
         });
-
-
-        btQuality.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                PopupMenu popup = new PopupMenu(MainActivity.this, view);
-
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-
-                        Toast.makeText(getApplicationContext(), "Please wait!", Toast.LENGTH_LONG).show();
-
-                        return false;
-                    }
-                });
-
-                Menu menu = popup.getMenu();
-                menu.add(Menu.NONE, 0, 0, "Video quality");
-                popup.show();
-
-            }
-        });
-
 
         simpleExoPlayer.addListener(new Player.EventListener() {
             @Override
@@ -252,21 +208,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btFullScreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
-
-            }
-        });
 
     }
 
     private void SetSpeed() {
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        setFullScreen();
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Set Speed");
         builder.setCancelable(false);
@@ -274,11 +220,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // the user clicked on colors[which]
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                setFullScreen();
 
-                if (which==0){
+                if (which == 0) {
 
                     speedTXT.setVisibility(View.VISIBLE);
                     speedTXT.setText("0.25X");
@@ -286,7 +230,8 @@ public class MainActivity extends AppCompatActivity {
                     simpleExoPlayer.setPlaybackParameters(param);
 
 
-                }  if (which==1){
+                }
+                if (which == 1) {
 
                     speedTXT.setVisibility(View.VISIBLE);
                     speedTXT.setText("0.5X");
@@ -295,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }
-                if (which==2){
+                if (which == 2) {
 
                     speedTXT.setVisibility(View.GONE);
                     PlaybackParameters param = new PlaybackParameters(1f);
@@ -303,14 +248,14 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }
-                if (which==3){
+                if (which == 3) {
                     speedTXT.setVisibility(View.VISIBLE);
                     speedTXT.setText("1.5X");
                     PlaybackParameters param = new PlaybackParameters(1.5f);
                     simpleExoPlayer.setPlaybackParameters(param);
 
                 }
-                if (which==4){
+                if (which == 4) {
 
                     speedTXT.setVisibility(View.VISIBLE);
                     speedTXT.setText("2X");
@@ -330,6 +275,8 @@ public class MainActivity extends AppCompatActivity {
 
         simpleExoPlayer.setPlayWhenReady(false);
         simpleExoPlayer.getPlaybackState();
+        playerView.setResizeMode(videoMode);
+        setFullScreen();
 
     }
 
@@ -338,7 +285,8 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         simpleExoPlayer.setPlayWhenReady(true);
         simpleExoPlayer.getPlaybackState();
-
+        playerView.setResizeMode(videoMode);
+        setFullScreen();
     }
 
     @Override
@@ -359,6 +307,12 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void setFullScreen() {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
 }

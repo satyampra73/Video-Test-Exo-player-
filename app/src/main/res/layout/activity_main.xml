@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".MainActivity">
 
 
@@ -17,7 +18,7 @@
         app:fastforward_increment="10000"
         app:show_timeout="5000"
         app:use_controller="true"
-        android:background="#ffffff"
+        android:background="@color/black"
         app:player_layout_id="@layout/exo_simple_player_view"
         app:controller_layout_id="@layout/custom_controller"/>
 
